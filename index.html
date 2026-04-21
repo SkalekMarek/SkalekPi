@@ -2,19 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Pi Million</title>
+    <title>SkalekPi</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    
     <style>
         body {
             margin: 0;
-            padding: 20px;
-            background-color: black;
+            padding: 0;
+            background-color: #1a1a1a;
             color: #D4FF1A;
-            font-family: monospace;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             font-weight: 400;
-            font-size: 13px;
-            white-space: pre-wrap;
-            word-break: break-all;
+            font-size: 11px;
+            line-height: 1.3;
+            height: 100vh;
+            overflow: hidden;
+            transition: none;
         }
+
+        #pi-content {
+            margin: 0;
+            padding: 20px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left; /* Aligned left looks more like raw text */
+        }
+
         body.inverted {
             background-color: white;
             color: black;
@@ -22,17 +35,30 @@
     </style>
 </head>
 <body>
-    <pre id="display">Loading pi-million.txt...</pre>
+
+    <pre id="pi-content">Loading Pi...</pre>
 
     <script>
-        document.addEventListener('keydown', (e) => {
-            if (e.key.toLowerCase() === 't') document.body.classList.toggle('inverted');
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 't' || event.key === 'T') {
+                document.body.classList.toggle('inverted');
+            }
         });
 
         fetch('pi-million.txt')
-            .then(res => res.text())
-            .then(text => document.getElementById('display').textContent = text)
-            .catch(err => document.getElementById('display').textContent = 'Error loading file.');
+            .then(response => {
+                if (!response.ok) throw new Error('File not found.');
+                return response.text();
+            })
+            .then(text => {
+                const content = document.getElementById('pi-content');
+                // Slicing and inserting <wbr> to force the dense grid layout
+                let displayData = text.slice(0, 1000000); 
+                content.innerHTML = displayData.replace(/(.)/g, '$1<wbr>');
+            })
+            .catch(error => {
+                document.getElementById('pi-content').textContent = 'Error: ' + error.message;
+            });
     </script>
 </body>
 </html>
