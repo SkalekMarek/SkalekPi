@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pi Million</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: black;
+            color: #D4FF1A;
+            font-family: monospace;
+            font-weight: 400;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        body.inverted {
+            background-color: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <pre id="display">Loading pi-million.txt...</pre>
+
+    <script>
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 't') document.body.classList.toggle('inverted');
+        });
+
+        fetch('pi-million.txt')
+            .then(res => res.text())
+            .then(text => document.getElementById('display').textContent = text)
+            .catch(err => document.getElementById('display').textContent = 'Error loading file.');
+    </script>
+</body>
+</html>
