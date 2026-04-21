@@ -8,24 +8,24 @@
     <style>
         body {
             margin: 0;
-            padding: 0;
+            padding: 20px;
             background-color: #1a1a1a;
             color: #D4FF1A;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-weight: 400;
             font-size: 11px;
             line-height: 1.3;
-            height: 100vh;
-            overflow: hidden;
-            transition: none;
+            /* Ensure scrolling is allowed */
+            overflow-y: scroll; 
+            transition: background-color 0.2s, color 0.2s;
         }
 
+        /* This is the key to fixing the lag: 
+           We let the browser handle the wrapping natively 
+           without extra HTML elements. */
         #pi-content {
+            white-space: pre-wrap; 
+            word-break: break-all;
             margin: 0;
-            padding: 20px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            text-align: left; /* Aligned left looks more like raw text */
         }
 
         body.inverted {
@@ -36,28 +36,23 @@
 </head>
 <body>
 
-    <pre id="pi-content">Loading Pi...</pre>
+    <pre id="pi-content">Loading...</pre>
 
     <script>
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 't' || event.key === 'T') {
-                document.body.classList.toggle('inverted');
-            }
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 't') document.body.classList.toggle('inverted');
         });
 
+        // The fetch already preloads the file into memory.
         fetch('pi-million.txt')
-            .then(response => {
-                if (!response.ok) throw new Error('File not found.');
-                return response.text();
-            })
+            .then(res => res.text())
             .then(text => {
-                const content = document.getElementById('pi-content');
-                // Slicing and inserting <wbr> to force the dense grid layout
-                let displayData = text.slice(0, 1000000); 
-                content.innerHTML = displayData.replace(/(.)/g, '$1<wbr>');
+                // Using textContent is vastly faster than innerHTML.
+                // It does not create extra tags, so no lag.
+                document.getElementById('pi-content').textContent = text;
             })
-            .catch(error => {
-                document.getElementById('pi-content').textContent = 'Error: ' + error.message;
+            .catch(err => {
+                document.getElementById('pi-content').textContent = 'Error loading file.';
             });
     </script>
 </body>
